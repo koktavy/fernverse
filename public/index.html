@@ -28,9 +28,9 @@
     broadcast=""
     renderer="colorManagement: true">
     <a-assets>
-      <!-- <a-asset-item id="sandCastleModel"
-        src="./assets/models/sand-castle.glb">
-      </a-asset-item> -->
+      <a-asset-item id="fernModel"
+        src="./assets/fern.glb">
+      </a-asset-item>
       <img id="groundSrc" src="https://cdn.aframe.io/a-painter/images/floor.jpg" crossorigin="anonymous">
       <img id="skySrc" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossorigin="anonymous">
     </a-assets>
@@ -42,19 +42,17 @@
       raycaster="objects: .cantap"
       cursor="fuse: false; rayOrigin: mouse;">
       <a-entity id="camera-proxy"
-        rotation="-90 0 0"></a-entity>
+        position="0 -0.2 0.3"
+        rotation="0 -15 0"></a-entity>
     </a-camera>
     
-    <a-cone
+    <a-entity
       follow="target: #camera-proxy"
-      broadcast="send: geometry, position, rotation, material"
-      radius-bottom="0.25"
-      height="0.5"
-      color="orange"
+      gltf-model="#fernModel"
+      broadcast="send: gltf-model, position, rotation, material"
       position="0 0 0"
       rotation="-90 0 0"
-      scale="0.13 0.1 0.1"
-    ></a-cone>
+    ></a-entity>
     <!-- <a-cone broadcast="send: geometry, position, rotation, material"
       follow="target: #camera-sphere"
       color="green"
