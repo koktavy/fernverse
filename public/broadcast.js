@@ -8,7 +8,7 @@ AFRAME.registerSystem('broadcast', {
     interval: {type: 'number', default: 10}
   },
   init: function () {
-    var sceneEl = this.el.sceneEl;
+    var scene = this.el.sceneEl;
     var url = this.data.url;
     let message = ''
     if (!url) { return; }
@@ -36,13 +36,17 @@ AFRAME.registerSystem('broadcast', {
       if (e.data.includes('Closed')) return
       // Process other messages
       message = JSON.parse(e.data)
-      console.log(message)
+      // console.log('MESSAGE', message)
       if (message.type === 'DOWNSTREAM_PLAYER_UPDATE') {
         if (message.updates && Array.isArray(message.updates)) {
           this.processUpdate(message.updates)
         }
+      } else if (message.type === 'PLAYER_DISCONNECT') {
+        if (message.updates && Array.isArray(message.updates)) {
+          this.removePlayer(message.updates)
+        }
       } else {
-        console.log('CLIENT MESSAGE', message);
+        console.log('UNHANDLED MESSAGE', message);
       }
     });
 
@@ -55,15 +59,15 @@ AFRAME.registerSystem('broadcast', {
     var that = this;
 
     this.processUpdate = (updates) => {
-      console.log('Processing:', updates)
+      // console.log('PROCESSING:', updates)
       updates.forEach(function syncState (entity) {
-        var el = sceneEl.querySelector('#' + entity.id);
+        var el = scene.querySelector('#' + entity.id);
 
         if (!el) {
           el = document.createElement('a-entity');
           el.setAttribute('id', entity.id);
-          sceneEl.appendChild(el);
-          console.log('CREATED NEW ENTITY', entity.id)
+          scene.appendChild(el);
+          // console.log('CREATED NEW ENTITY', entity.id)
         }
 
         entity.components.forEach(function setAttribute (component) {
@@ -79,6 +83,14 @@ AFRAME.registerSystem('broadcast', {
         });
       });
     };
+
+    this.removePlayer = (updates) => {
+      // console.log('REMOVING PLAYER', updates)
+      updates.forEach(function removeEntity (entity) {
+        const toRemove = document.getElementById(entity.id)
+        if (toRemove) toRemove.remove()
+      })
+    }
 
     this.addSend = AFRAME.utils.bind(this.addSend, this)
   },

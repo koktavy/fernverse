@@ -50,8 +50,8 @@ wss.on('connection', (client) => {
       // console.log(players)
       data.type = 'DOWNSTREAM_PLAYER_UPDATE'
       wss.clients.forEach(function each(otherClient) {
+        if (otherClient.readyState !== WebSocket.OPEN) return
         if (otherClient.id === client.id) return
-        console.log('Sending to:', otherClient.id, data)
         otherClient.send(JSON.stringify(data))
       })
     } else if (data.type === 'DOWNSTREAM_PLAYER_UPDATE') {
@@ -66,15 +66,19 @@ wss.on('connection', (client) => {
     console.log('This Connection Closed!')
     console.log('Removing Client: ' + client.id)
 
-    //Iterate over all clients and inform them this client has disconnected
-    wss.clients.forEach(function each(cl) {
-      if (cl.readyState === WebSocket.OPEN) {
-        console.log(`Client ${client.id} left`)
-        //Send to client which other client (via/ id) has disconnected
-        cl.send(`Closed: ${client.id}`);
-      }
-    });
+    // Create a disconnect message
+    const message = {
+      type: 'PLAYER_DISCONNECT',
+      updates: players[client.id]
+    }
+    // Send to all other clients
+    wss.clients.forEach(function each(otherClient) {
+      if (otherClient.readyState !== WebSocket.OPEN) return
+      if (otherClient.id === client.id) return
+      otherClient.send(JSON.stringify(message))
+    })
 
+    console.log(`Client ${client.id} left`)
     delete players['' + client.id]
   })
 }, {once: true})
