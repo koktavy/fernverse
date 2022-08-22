@@ -20,12 +20,12 @@ app.use(express.static(path.join(__dirname, '/public')));
 //   console.log(`Server started on port ${PORT}`);
 // });
 
-// const httpsServer = https.createServer(options, app).listen(PORT, () => {
-//   console.log(`HTTPS server started on port ${PORT}`);
-// });
+const httpsServer = https.createServer(options, app).listen(PORT, () => {
+  console.log(`HTTPS server started on port ${PORT}`);
+});
 
-const wss = new WebSocket.WebSocketServer({ port: PORT })
-// const wss = new WebSocket.Server({ server: httpsServer })
+// const wss = new WebSocket.WebSocketServer({ port: PORT })
+const wss = new WebSocket.Server({ server: httpsServer })
 
 let players = {}
 
