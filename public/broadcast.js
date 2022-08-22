@@ -47,8 +47,10 @@ AFRAME.registerSystem('broadcast', {
     });
 
     this.sendQueue = [];
-    this.helperQuaternionReceive = new THREE.Quaternion();
-    this.helperQuaternionSend = new THREE.Quaternion();
+    this.worldPositionReceive = new THREE.Vector3();
+    this.worldPositionSend = new THREE.Vector3();
+    this.worldQuaternionReceive = new THREE.Quaternion();
+    this.worldQuaternionSend = new THREE.Quaternion();
 
     var that = this;
 
@@ -58,17 +60,19 @@ AFRAME.registerSystem('broadcast', {
         var el = sceneEl.querySelector('#' + entity.id);
 
         if (!el) {
-          var parentEl = sceneEl.querySelector('#' + entity.parentId) || sceneEl;
           el = document.createElement('a-entity');
           el.setAttribute('id', entity.id);
-          parentEl.appendChild(el);
+          sceneEl.appendChild(el);
           console.log('CREATED NEW ENTITY', entity.id)
         }
 
         entity.components.forEach(function setAttribute (component) {
           if (component[0] === 'rotation') {
-            that.helperQuaternionReceive.fromArray(component[1]);
-            el.object3D.setRotationFromQuaternion(that.helperQuaternionReceive);
+            that.worldQuaternionReceive.fromArray(component[1]);
+            el.object3D.setRotationFromQuaternion(that.worldQuaternionReceive);
+          } else if (component[0] === 'position') {
+            that.worldPositionReceive.fromArray(component[1]);
+            el.object3D.position.set(that.worldPositionReceive.x, that.worldPositionReceive.y, that.worldPositionReceive.z);
           } else {
             el.setAttribute(component[0], component[1]);
           };
@@ -90,8 +94,11 @@ AFRAME.registerSystem('broadcast', {
         parentId: el.parentNode.getAttribute('id'),
         components: sendComponents.map(function getAttribute (componentName) {
           if (componentName === 'rotation') {
-            that.helperQuaternionSend.copy(el.object3D.quaternion);
-            return [componentName, that.helperQuaternionSend.toArray()];
+            el.object3D.getWorldQuaternion(that.worldQuaternionSend);
+            return [componentName, that.worldQuaternionSend.toArray()];
+          } else if (componentName === 'position') {
+            el.object3D.getWorldPosition(that.worldPositionSend);
+            return [componentName, that.worldPositionSend.toArray()];
           } else {
             return [componentName, el.getAttribute(componentName)];
           };
