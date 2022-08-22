@@ -1,11 +1,21 @@
 {
-  "name": "websockets",
+  "name": "ferns.lol",
   "version": "1.0.0",
-  "description": "AR House Hackathon #2 - Websocket learning project",
+  "description": "With a little help from my ferns",
   "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [
+    "ferns",
+    "lol",
+    "ar",
+    "vr",
+    "xr",
+    "multiplayer",
+    "ar-house"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/koktavy/websockets.git"
