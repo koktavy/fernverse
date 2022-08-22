@@ -14,7 +14,7 @@ const options = {
 };
 
 const app = express();
-app.use("/", express.static("public"));
+app.use(express.static(path.join(__dirname, '/public')));
 
 // const server = app.listen(PORT, () => {
 //   console.log(`Server started on port ${PORT}`);
