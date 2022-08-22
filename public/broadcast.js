@@ -4,7 +4,7 @@ if (typeof AFRAME === 'undefined') {
 
 AFRAME.registerSystem('broadcast', {
   schema: {
-    url: {type: 'string', default: `wss://${window.location.host}/`},
+    url: {type: 'string', default: `ws://${window.location.host}/`},
     interval: {type: 'number', default: 10}
   },
   init: function () {

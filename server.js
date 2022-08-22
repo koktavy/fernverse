@@ -17,16 +17,17 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '/public/index.html'));
 })
 
-// const server = app.listen(PORT, () => {
-//   console.log(`Server started on port ${PORT}`);
-// });
-
-const httpsServer = https.createServer(options, app).listen(PORT, () => {
-  console.log(`HTTPS server started on port ${PORT}`);
+const server = app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
 });
 
+// const httpsServer = https.createServer(options, app).listen(PORT, () => {
+//   console.log(`HTTPS server started on port ${PORT}`);
+// });
+
 // const wss = new WebSocket.WebSocketServer({ port: PORT })
-const wss = new WebSocket.Server({ server: httpsServer })
+const wss = new WebSocket.Server({ server: server })
+// const wss = new WebSocket.Server({ server: httpsServer })
 
 let players = {}
 
