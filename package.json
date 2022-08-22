@@ -2,9 +2,9 @@
   "name": "ferns.lol",
   "version": "1.0.0",
   "description": "With a little help from my ferns",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node server.js"
   },
   "keywords": [
     "ferns",
