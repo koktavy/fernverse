@@ -8,10 +8,7 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, './.env') })
 
 const PORT = process.env.PORT || 8080;
-const options = {
-  key: fs.readFileSync("./config/cert.key"),
-  cert: fs.readFileSync("./config/cert.crt"),
-};
+const options = {};
 
 const app = express();
 app.use(express.static(path.join(__dirname, '/public')));
