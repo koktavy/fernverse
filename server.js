@@ -27,36 +27,54 @@ const httpsServer = https.createServer(options, app).listen(PORT, () => {
 // const wss = new WebSocket.Server({ server: server })
 const wss = new WebSocket.Server({ server: httpsServer })
 
-let players = {
-  'type': 'player',
-}
+let players = {}
 
 wss.on('listening', () => {
   console.log(`Websockets listening on ${process.env.PORT || 8080}`);
 })
 
-wss.on('upgrade', function (req, socket, head) {
-  wss.handleUpgrade(req, socket, head);
-});
-
 wss.on('connection', (client) => {
-  console.log('Client connected')
   // Give the new client a unique id, add to the players object
   client.id = uuid()
-  players['' + client.id] = {id: client.id}
-  // Send the players object to the new client
-  client.send(JSON.stringify(players))
+  console.log('Client connected', client.id)
+  players[client.id] = {}
+  // Send the players object to the new client for reference
+  // client.send(JSON.stringify(players))
 
   // Process incoming messages from the client
   client.on('message', (message) => {
     const data = JSON.parse(message)
-    console.log(data)
+    // Process upstream client updates, send downstream to all other players
+    if (data.type === 'UPSTREAM_PLAYER_UPDATE') {
+      players[client.id] = data.updates
+      // console.log(players)
+      data.type = 'DOWNSTREAM_PLAYER_UPDATE'
+      wss.clients.forEach(function each(otherClient) {
+        if (otherClient.id === client.id) return
+        console.log('Sending to:', otherClient.id, data)
+        otherClient.send(JSON.stringify(data))
+      })
+    } else if (data.type === 'DOWNSTREAM_PLAYER_UPDATE') {
+      return
+    } else {
+      console.log('Unknown message type', message)
+    }
   })
 
   // Handle client disconnection
   client.on('close', () => {
-    console.log(`Client ${client.id} disconnected`)
+    console.log('This Connection Closed!')
+    console.log('Removing Client: ' + client.id)
+
+    //Iterate over all clients and inform them this client has disconnected
+    wss.clients.forEach(function each(cl) {
+      if (cl.readyState === WebSocket.OPEN) {
+        console.log(`Client ${client.id} left`)
+        //Send to client which other client (via/ id) has disconnected
+        cl.send(`Closed: ${client.id}`);
+      }
+    });
+
     delete players['' + client.id]
-    // client.send(JSON.stringify(players))
   })
-})
+}, {once: true})

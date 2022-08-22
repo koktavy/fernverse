@@ -17,25 +17,59 @@
   <!-- <script src='https://cdn.8thwall.com/web/landing-page/landing-page.js'></script> -->
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+
+  <!-- import the broadcast script from the public folder -->
+  <script src="./broadcast.js"></script>
+  <script src="./follow.js"></script>
 </head>
 
 <body>
-    <a-scene
-      renderer="colorManagement: true">
+  <a-scene id="scene"
+    broadcast=""
+    renderer="colorManagement: true">
     <a-assets>
       <!-- <a-asset-item id="sandCastleModel"
         src="./assets/models/sand-castle.glb">
       </a-asset-item> -->
-
-      <!-- <img id="UV"
-        src="./assets/models/textures/uv.jpg" /> -->
+      <img id="groundSrc" src="https://cdn.aframe.io/a-painter/images/floor.jpg" crossorigin="anonymous">
+      <img id="skySrc" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossorigin="anonymous">
     </a-assets>
 
+    <!-- geometry="primitive: sphere; depth: 0.3; height: 0.3; width: 0.3" -->
+    <!-- broadcast="send: position, rotation" -->
     <a-camera id="camera"
       position="0 1.6 2"
       raycaster="objects: .cantap"
       cursor="fuse: false; rayOrigin: mouse;">
+      <a-entity id="camera-proxy"
+        rotation="-90 0 0"></a-entity>
     </a-camera>
+    
+    <a-cone
+      follow="target: #camera-proxy"
+      broadcast="send: geometry, position, rotation, material"
+      radius-bottom="0.25"
+      height="0.5"
+      color="orange"
+      position="0 0 0"
+      rotation="-90 0 0"
+      scale="0.13 0.1 0.1"
+    ></a-cone>
+    <!-- <a-cone broadcast="send: geometry, position, rotation, material"
+      follow="target: #camera-sphere"
+      color="green"
+      position="0 -0.1 -0.8"
+      rotation="-90 0 0"
+      scale="0.13 0.1 0.1"
+    ></a-cone> -->
+
+    <!-- <a-entity broadcast="send: position" >
+      <a-entity broadcast="send: geometry, material, position"
+        geometry="primitive: cone; height: 1.5; radiusTop: 0.1; radiusBottom: 0.4"
+        material="color: #222"
+        position="0 -1 0">
+      </a-entity>
+    </a-entity> -->
 
     <a-entity light="
         type: directional;
@@ -54,10 +88,27 @@
     </a-light>
 
     <a-box
-      rotation="0 5 0"
-      position="1 0.5 -0.3">
+      rotation="45 0 45"
+      position="0 3 0"
+      scale="0.7 0.7 0.7"
+      animation__rotate="property: rotation; to: 45 360 45; dur: 7500; easing: linear; loop: true"
+      shadow>
     </a-box>
 
+    <a-box
+      rotation="45 180 45"
+      position="-2 -0.2 0"
+      scale="0.7 0.7 0.7"
+      material="color: blue"
+      shadow>
+    </a-box>
+    <a-box
+      rotation="45 0 45"
+      position="2 -0.2 0"
+      scale="0.7 0.7 0.7"
+      material="color: red"
+      shadow>
+    </a-box>
     <!-- <a-entity id="model"
       gltf-model="#sandCastleModel"
       position="0 0 0"
@@ -68,27 +119,16 @@
     <a-plane id="ground"
       class="cantap"
       rotation="-90 0 0"
-      width="20"
-      height="20"
-      material="src: #UV; color: green"
+      width="200"
+      height="200"
+      material="src: #groundSrc; color: green"
       shadow>
     </a-plane>
 
+    <a-sky id="background" src="#skySrc" theta-length="90" radius="100"></a-sky>
+
   </a-scene>
 
-  <script>
-    const ws = new WebSocket(`wss://${window.location.host}/`);
-    console.log('Client ws:', ws);
-    ws.addEventListener('error', (e) => { console.log("server error", e); });
-    ws.addEventListener('open', (e) => { console.log("websocket connection open"); });
-    ws.addEventListener('close', (e) => {
-      console.log("websocket connection closed");
-      console.log(e);  
-    });
-    ws.addEventListener('message', (e) => {
-      console.log(e.data)
-    });
-  </script>
 </body>
 
 </html>
