@@ -7,8 +7,9 @@ const uuid = require('uuid-random');
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, './.env') })
 
+const isLocal = process.env.ENV === 'dev';
+
 const PORT = process.env.PORT || 8080;
-const options = {};
 
 const app = express();
 app.use(express.static(path.join(__dirname, '/public')));
@@ -17,17 +18,23 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '/public/index.html'));
 })
 
-const server = app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
-});
+let wss = null
 
-// const httpsServer = https.createServer(options, app).listen(PORT, () => {
-//   console.log(`HTTPS server started on port ${PORT}`);
-// });
-
-// const wss = new WebSocket.WebSocketServer({ port: PORT })
-const wss = new WebSocket.Server({ server: server })
-// const wss = new WebSocket.Server({ server: httpsServer })
+if (isLocal) {
+  const options = {
+    key: fs.readFileSync("./config/cert.key"),
+    cert: fs.readFileSync("./config/cert.crt"),
+  };
+  const httpsServer = https.createServer(options, app).listen(PORT, () => {
+    console.log(`HTTPS server started on port ${PORT}`);
+  });
+  wss = new WebSocket.Server({ server: httpsServer })
+} else {
+  const server = app.listen(PORT, () => {
+    console.log(`Server started on port ${PORT}`);
+  });
+  wss = new WebSocket.Server({ server: server })
+}
 
 let players = {}
 
