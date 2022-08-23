@@ -29,7 +29,7 @@
     renderer="colorManagement: true"
     vr-mode-ui="enabled: false">
     <a-assets>
-      <a-asset-item id="fernModel" src="./assets/fern.glb"></a-asset-item> <!-- Plant (animated) by inter_net on Sketchfab! https://sketchfab.com/3d-models/plant-animated-b4e719dd02f942d1b1b712003fc15569 -->
+      <a-asset-item id="fernModel" src="./assets/fern/fern.glb" timeout="10000"></a-asset-item> <!-- Plant (animated) by inter_net on Sketchfab! https://sketchfab.com/3d-models/plant-animated-b4e719dd02f942d1b1b712003fc15569 -->
       <img id="groundSrc" src="https://cdn.aframe.io/a-painter/images/floor.jpg" crossorigin="anonymous">
       <img id="skySrc" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossorigin="anonymous">
     </a-assets>
@@ -43,7 +43,7 @@
       <a-entity
         gltf-model="#fernModel"
         animation-mixer="clip: *; loop: true;"
-        broadcast="send: gltf-model, animation-mixer, position, rotation, material"
+        broadcast="send: gltf-model, animation-mixer, position, rotation"
         position="0 -0.2 0.2"
         rotation="0 -15 0">
       </a-entity>
